@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rankings</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="rankings.html">Rankings</a>
+  <a href="events.html">Events</a>
+  <a href="players.html">Players</a>
+</nav>
+
+<div class="section">
+  <h1 id="title">Rankings</h1>
+
+  <div class="button-container">
+    <button class="year-btn" onclick="go('2033')">2033</button>
+    <button class="year-btn" onclick="go('2032')">2032</button>
+    <button class="year-btn" onclick="go('2031')">2031</button>
+    <button class="year-btn" onclick="go('2030')">2030</button>
+    <button class="year-btn" onclick="go('2029')">2029</button>
+    <button class="year-btn" onclick="go('2028')">2028</button>
+  </div>
+
+  <table id="table">
+    <tr>
+      <th>Rank</th>
+      <th>Team</th>
+      <th>Record</th>
+    </tr>
+  </table>
+</div>
+
+<div class="footer">
+  © 2026 Lacrosse Hub
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const year = params.get("year") || "2030";
+
+document.getElementById("title").innerText = year + " Rankings";
+
+function go(year) {
+  window.location.href = "rankings.html?year=" + year;
+}
+
+fetch("http://localhost:3000/api/rankings/" + year)
+  .then(res => res.json())
+  .then(data => {
+    const table = document.getElementById("table");
+
+    data.forEach(team => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${team.rank}</td>
+        <td>${team.team}</td>
+        <td>${team.record}</td>
+      `;
+      table.appendChild(row);
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lacrosse Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="rankings.html">Rankings</a>
+  <a href="events.html">Events</a>
+  <a href="players.html">Players</a>
+</nav>
+
+<div class="hero">
+  <h1>LACROSSE HUB</h1>
+  <p>Rankings • Players • Events • Recruiting</p>
+</div>
+
+<div class="section">
+  <h2>Select Grad Year</h2>
+
+  <div class="button-container">
+    <button class="year-btn" onclick="go('2033')">2033</button>
+    <button class="year-btn" onclick="go('2032')">2032</button>
+    <button class="year-btn" onclick="go('2031')">2031</button>
+    <button class="year-btn" onclick="go('2030')">2030</button>
+    <button class="year-btn" onclick="go('2029')">2029</button>
+    <button class="year-btn" onclick="go('2028')">2028</button>
+    <button class="year-btn" onclick="go('college')">College</button>
+  </div>
+</div>
+
+<div class="footer">
+  © 2026 Lacrosse Hub
+</div>
+
+<script>
+function go(year) {
+  window.location.href = "rankings.html?year=" + year;
+}
+</script>
+
+</body>
+</html>

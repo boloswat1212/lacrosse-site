@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="section">
+  <h1>Admin Panel</h1>
+
+  <!-- PLAYERS -->
+  <h2>Players</h2>
+  <input id="p_name" placeholder="Name">
+  <input id="p_grad" placeholder="Grad">
+  <input id="p_position" placeholder="Position">
+  <input id="p_goals" placeholder="Goals">
+  <button onclick="addPlayer()">Add</button>
+
+  <h3>Player List</h3>
+  <div id="playersList"></div>
+
+  <!-- EVENTS -->
+  <h2>Events</h2>
+  <input id="e_name" placeholder="Name">
+  <input id="e_location" placeholder="Location">
+  <input id="e_date" placeholder="Date">
+  <button onclick="addEvent()">Add</button>
+
+  <h3>Event List</h3>
+  <div id="eventsList"></div>
+
+  <!-- RANKINGS -->
+  <h2>Rankings (2030)</h2>
+  <input id="r_year" placeholder="Year">
+  <input id="r_rank" placeholder="Rank">
+  <input id="r_team" placeholder="Team">
+  <input id="r_record" placeholder="Record">
+  <button onclick="addRanking()">Add</button>
+
+  <h3>Ranking List</h3>
+  <div id="rankingsList"></div>
+</div>
+
+<script>
+function loadAll() {
+  fetch("/api/players")
+    .then(res => res.json())
+    .then(players => {
+      document.getElementById("playersList").innerHTML =
+        players.map((p,i) =>
+          `<div>${p.name} (${p.grad}) - ${p.position}
+          <button onclick="deletePlayer(${i})">Delete</button></div>`
+        ).join("");
+    });
+
+  fetch("/api/events")
+    .then(res => res.json())
+    .then(events => {
+      document.getElementById("eventsList").innerHTML =
+        events.map((e,i) =>
+          `<div>${e.name} (${e.location})
+          <button onclick="deleteEvent(${i})">Delete</button></div>`
+        ).join("");
+    });
+
+  fetch("/api/rankings/2030")
+    .then(res => res.json())
+    .then(rankings => {
+      document.getElementById("rankingsList").innerHTML =
+        rankings.map((r,i) =>
+          `<div>#${r.rank} ${r.team} (${r.record})
+          <button onclick="deleteRanking(${i})">Delete</button></div>`
+        ).join("");
+    });
+}
+
+/* ADD */
+function addPlayer() {
+  fetch("/api/add-player", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: p_name.value,
+      grad: Number(p_grad.value),
+      position: p_position.value,
+      goals: Number(p_goals.value)
+    })
+  }).then(loadAll);
+}
+
+function addEvent() {
+  fetch("/api/add-event", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: e_name.value,
+      location: e_location.value,
+      date: e_date.value
+    })
+  }).then(loadAll);
+}
+
+function addRanking() {
+  fetch("/api/add-ranking", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      year: r_year.value,
+      rank: Number(r_rank.value),
+      team: r_team.value,
+      record: r_record.value
+    })
+  }).then(loadAll);
+}
+
+/* DELETE */
+function deletePlayer(i) {
+  fetch("/api/delete-player", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ index: i })
+  }).then(loadAll);
+}
+
+function deleteEvent(i) {
+  fetch("/api/delete-event", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ index: i })
+  }).then(loadAll);
+}
+
+function deleteRanking(i) {
+  fetch("/api/delete-ranking", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ index: i })
+  }).then(loadAll);
+}
+
+/* LOAD ON START */
+window.onload = loadAll;
+</script>
+
+</body>
+</html>
