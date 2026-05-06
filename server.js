@@ -32,28 +32,17 @@ app.use(session({
 
 app.use(express.static("public"));
 
-/* LOGIN */
-const ADMIN_PASSWORD = "1234";
-
-app.post("/api/login", (req, res) => {
-  if (req.body.password === ADMIN_PASSWORD) {
-    req.session.loggedIn = true;
-    res.json({ success: true });
-  } else {
-    res.json({ success: false });
-  }
-});
-
-/* AUTH */
+/* NO LOGIN REQUIRED (FOR NOW) */
 function requireLogin(req, res, next) {
-  if (!req.session.loggedIn) {
-    return res.status(401).json({ error: "Not authorized" });
-  }
   next();
 }
 
 /* ROUTES */
-app.get("/api/players", (req, res) => res.json(data.players));
+
+/* PLAYERS */
+app.get("/api/players", (req, res) => {
+  res.json(data.players);
+});
 
 app.post("/api/add-player", requireLogin, (req, res) => {
   data.players.push(req.body);
@@ -61,7 +50,16 @@ app.post("/api/add-player", requireLogin, (req, res) => {
   res.json({ success: true });
 });
 
-app.get("/api/events", (req, res) => res.json(data.events));
+app.post("/api/delete-player", requireLogin, (req, res) => {
+  data.players.splice(req.body.index, 1);
+  saveData();
+  res.json({ success: true });
+});
+
+/* EVENTS */
+app.get("/api/events", (req, res) => {
+  res.json(data.events);
+});
 
 app.post("/api/add-event", requireLogin, (req, res) => {
   data.events.push(req.body);
@@ -69,6 +67,13 @@ app.post("/api/add-event", requireLogin, (req, res) => {
   res.json({ success: true });
 });
 
+app.post("/api/delete-event", requireLogin, (req, res) => {
+  data.events.splice(req.body.index, 1);
+  saveData();
+  res.json({ success: true });
+});
+
+/* RANKINGS */
 app.get("/api/rankings/:year", (req, res) => {
   const results = data.rankings
     .filter(r => r.year == req.params.year)
@@ -78,6 +83,12 @@ app.get("/api/rankings/:year", (req, res) => {
 
 app.post("/api/add-ranking", requireLogin, (req, res) => {
   data.rankings.push(req.body);
+  saveData();
+  res.json({ success: true });
+});
+
+app.post("/api/delete-ranking", requireLogin, (req, res) => {
+  data.rankings.splice(req.body.index, 1);
   saveData();
   res.json({ success: true });
 });

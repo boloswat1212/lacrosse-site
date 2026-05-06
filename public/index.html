@@ -1,45 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Lacrosse Hub</title>
-  <link rel="stylesheet" href="style.css">
+  <title>LacrosseHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-<nav>
-  <a href="index.html">Home</a>
-  <a href="rankings.html">Rankings</a>
-  <a href="events.html">Events</a>
-  <a href="players.html">Players</a>
-</nav>
+<body class="bg-gray-100 text-black">
 
-<div class="hero">
-  <h1>LACROSSE HUB</h1>
-  <p>Rankings • Players • Events • Recruiting</p>
-</div>
+<!-- TOP NAV -->
+<div class="bg-green-500 text-black px-6 py-3 flex justify-between items-center">
+  <h1 class="text-2xl font-bold">LacrosseHub</h1>
 
-<div class="section">
-  <h2>Select Grad Year</h2>
-
-  <div class="button-container">
-    <button class="year-btn" onclick="go('2033')">2033</button>
-    <button class="year-btn" onclick="go('2032')">2032</button>
-    <button class="year-btn" onclick="go('2031')">2031</button>
-    <button class="year-btn" onclick="go('2030')">2030</button>
-    <button class="year-btn" onclick="go('2029')">2029</button>
-    <button class="year-btn" onclick="go('2028')">2028</button>
-    <button class="year-btn" onclick="go('college')">College</button>
+  <div class="space-x-6 font-semibold">
+    <a href="index.html">Home</a>
+    <a href="rankings.html">Rankings</a>
+    <a href="players.html">Players</a>
+    <a href="events.html">Events</a>
   </div>
 </div>
 
-<div class="footer">
-  © 2026 Lacrosse Hub
+<!-- SECOND NAV -->
+<div class="bg-gray-800 text-white px-6 py-3 flex gap-6 text-sm overflow-x-auto">
+  <span class="font-bold">RECRUITING DATABASE</span>
+  <span>RECRUITS</span>
+  <span class="text-green-400">RANKINGS</span>
+  <span>STAR RATINGS</span>
+  <span>EVALUATIONS</span>
+  <span>CLASS RANKINGS</span>
+  <span>COMMITMENTS</span>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="max-w-7xl mx-auto mt-8 px-6">
+
+  <!-- HEADER -->
+  <div class="bg-white p-6 rounded shadow">
+    <h2 class="text-2xl font-bold mb-4">Class Rankings</h2>
+
+    <!-- FILTER BAR -->
+    <div class="flex gap-4 mb-6">
+      <select class="border p-2" onchange="changeYear(this.value)">
+        <option value="2030">Class of 2030</option>
+        <option value="2029">Class of 2029</option>
+        <option value="2028">Class of 2028</option>
+        <option value="2027">Class of 2027</option>
+        <option value="2026">Class of 2026</option>
+        <option value="2025">Class of 2025</option>
+        <option value="college">College</option>
+      </select>
+
+      <select class="border p-2">
+        <option>Club</option>
+      </select>
+    </div>
+
+    <!-- TABLE -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm border">
+
+        <thead class="bg-gray-200 text-gray-700">
+          <tr>
+            <th class="p-3 text-left">RANK</th>
+            <th class="p-3 text-left">TEAM</th>
+            <th class="p-3 text-left">RECORD</th>
+          </tr>
+        </thead>
+
+        <tbody id="rankings" class="bg-white"></tbody>
+
+      </table>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
-function go(year) {
-  window.location.href = "rankings.html?year=" + year;
+let currentYear = 2030;
+
+function changeYear(year) {
+  currentYear = year;
+  loadRankings();
 }
+
+function loadRankings() {
+  fetch("/api/rankings/" + currentYear)
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("rankings").innerHTML =
+        data.map((r, i) => `
+          <tr class="border-b hover:bg-gray-100">
+            <td class="p-3 font-bold">${i + 1}</td>
+            <td class="p-3 font-semibold">${r.team}</td>
+            <td class="p-3">${r.record}</td>
+          </tr>
+        `).join("");
+    });
+}
+
+loadRankings();
 </script>
 
 </body>

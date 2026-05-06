@@ -2,32 +2,41 @@
 <html>
 <head>
   <title>Events</title>
-  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-<nav>
-  <a href="index.html">Home</a>
-  <a href="rankings.html">Rankings</a>
-  <a href="events.html">Events</a>
-  <a href="players.html">Players</a>
-</nav>
+<body class="bg-gray-900 text-white">
 
-<h1>Events</h1>
+<!-- NAVBAR -->
+<div class="bg-black border-b border-gray-800 px-8 py-4 flex justify-between items-center">
+  <h1 class="text-2xl font-bold text-blue-400">LacrosseHub</h1>
 
-<ul id="events"></ul>
+  <div class="space-x-6 text-lg">
+    <a href="index.html" class="hover:text-blue-400">Home</a>
+    <a href="rankings.html" class="hover:text-blue-400">Rankings</a>
+    <a href="players.html" class="hover:text-blue-400">Players</a>
+    <a href="events.html" class="text-blue-400">Events</a>
+  </div>
+</div>
+
+<div class="text-center py-12">
+  <h2 class="text-4xl font-bold">Events</h2>
+</div>
+
+<div class="max-w-6xl mx-auto p-8 grid gap-6" id="events"></div>
 
 <script>
-fetch("http://localhost:3000/api/events")
-  .then(res => res.json())
+fetch("/api/events")
+  .then(r => r.json())
   .then(data => {
-    const list = document.getElementById("events");
-
-    data.forEach(e => {
-      const li = document.createElement("li");
-      li.textContent = `${e.name} - ${e.location} (${e.date})`;
-      list.appendChild(li);
-    });
+    document.getElementById("events").innerHTML =
+      data.map(e => `
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
+          <h3 class="text-2xl text-blue-400">${e.name}</h3>
+          <p class="mt-2">${e.location}</p>
+          <p>${e.date}</p>
+        </div>
+      `).join("");
   });
 </script>
 

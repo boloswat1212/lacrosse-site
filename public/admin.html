@@ -1,39 +1,165 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admin Login</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-<div class="section">
-  <h1>Admin Login</h1>
+<body class="bg-gray-900 text-white p-8">
 
-  <input type="password" id="password" placeholder="Enter password">
-  <br><br>
-  <button class="year-btn" onclick="login()">Login</button>
+<h1 class="text-3xl font-bold mb-8 text-blue-400">Admin Panel</h1>
 
-  <p id="msg"></p>
+<!-- PLAYERS -->
+<div class="mb-10 bg-gray-800 p-6 rounded-xl">
+  <h2 class="text-xl mb-4">Add Player</h2>
+
+  <input id="pname" placeholder="Name" class="text-black p-2 mr-2">
+  <input id="pgrad" placeholder="Grad" class="text-black p-2 mr-2">
+  <input id="ppos" placeholder="Position" class="text-black p-2 mr-2">
+  <input id="pgoals" placeholder="Goals" class="text-black p-2 mr-2">
+
+  <button onclick="addPlayer()" class="bg-blue-500 px-4 py-2 ml-2">Add</button>
+
+  <h3 class="mt-6 mb-2">Player List</h3>
+  <div id="playerList"></div>
+</div>
+
+<!-- EVENTS -->
+<div class="mb-10 bg-gray-800 p-6 rounded-xl">
+  <h2 class="text-xl mb-4">Add Event</h2>
+
+  <input id="ename" placeholder="Name" class="text-black p-2 mr-2">
+  <input id="elocation" placeholder="Location" class="text-black p-2 mr-2">
+  <input id="edate" placeholder="Date" class="text-black p-2 mr-2">
+
+  <button onclick="addEvent()" class="bg-blue-500 px-4 py-2 ml-2">Add</button>
+
+  <h3 class="mt-6 mb-2">Event List</h3>
+  <div id="eventList"></div>
+</div>
+
+<!-- RANKINGS -->
+<div class="bg-gray-800 p-6 rounded-xl">
+  <h2 class="text-xl mb-4">Add Ranking</h2>
+
+  <input id="ryear" placeholder="Year" class="text-black p-2 mr-2">
+  <input id="rrank" placeholder="Rank" class="text-black p-2 mr-2">
+  <input id="rteam" placeholder="Team" class="text-black p-2 mr-2">
+  <input id="rrecord" placeholder="Record" class="text-black p-2 mr-2">
+
+  <button onclick="addRanking()" class="bg-blue-500 px-4 py-2 ml-2">Add</button>
+
+  <h3 class="mt-6 mb-2">Ranking List</h3>
+  <div id="rankingList"></div>
 </div>
 
 <script>
-function login() {
-  const password = document.getElementById("password").value;
+function loadAll() {
+  // PLAYERS
+  fetch("/api/players")
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("playerList").innerHTML =
+        data.map((p, i) => `
+          <div class="flex justify-between bg-gray-700 p-2 mb-2 rounded">
+            <span>${p.name} (${p.grad})</span>
+            <button onclick="deletePlayer(${i})" class="bg-red-500 px-2">Delete</button>
+          </div>
+        `).join("");
+    });
 
-  fetch("/api/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      window.location.href = "dashboard.html";
-    } else {
-      document.getElementById("msg").innerText = "Wrong password";
-    }
-  });
+  // EVENTS
+  fetch("/api/events")
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("eventList").innerHTML =
+        data.map((e, i) => `
+          <div class="flex justify-between bg-gray-700 p-2 mb-2 rounded">
+            <span>${e.name}</span>
+            <button onclick="deleteEvent(${i})" class="bg-red-500 px-2">Delete</button>
+          </div>
+        `).join("");
+    });
+
+  // RANKINGS
+  fetch("/api/rankings/2030")
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("rankingList").innerHTML =
+        data.map((r, i) => `
+          <div class="flex justify-between bg-gray-700 p-2 mb-2 rounded">
+            <span>#${r.rank} ${r.team}</span>
+            <button onclick="deleteRanking(${i})" class="bg-red-500 px-2">Delete</button>
+          </div>
+        `).join("");
+    });
 }
+
+/* ADD */
+function addPlayer() {
+  fetch("/api/add-player", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      name: pname.value,
+      grad: pgrad.value,
+      position: ppos.value,
+      goals: pgoals.value
+    })
+  }).then(() => { alert("Added"); loadAll(); });
+}
+
+function addEvent() {
+  fetch("/api/add-event", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      name: ename.value,
+      location: elocation.value,
+      date: edate.value
+    })
+  }).then(() => { alert("Added"); loadAll(); });
+}
+
+function addRanking() {
+  fetch("/api/add-ranking", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      year: ryear.value,
+      rank: rrank.value,
+      team: rteam.value,
+      record: rrecord.value
+    })
+  }).then(() => { alert("Added"); loadAll(); });
+}
+
+/* DELETE */
+function deletePlayer(i) {
+  fetch("/api/delete-player", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ index: i })
+  }).then(() => loadAll());
+}
+
+function deleteEvent(i) {
+  fetch("/api/delete-event", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ index: i })
+  }).then(() => loadAll());
+}
+
+function deleteRanking(i) {
+  fetch("/api/delete-ranking", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ index: i })
+  }).then(() => loadAll());
+}
+
+loadAll();
 </script>
 
 </body>

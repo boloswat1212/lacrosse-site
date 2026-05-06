@@ -1,12 +1,31 @@
 {
   "players": [
     {
-      "name": "Test",
-      "grad": null,
-      "position": "test",
-      "goals": null
+      "name": "Blake Bologna",
+      "grad": "2030",
+      "position": "Defense",
+      "goals": "1"
     }
   ],
   "events": [],
-  "rankings": []
+  "rankings": [
+    {
+      "year": "2026",
+      "rank": "1",
+      "team": "Detroit Country Day",
+      "record": "10-2"
+    },
+    {
+      "year": "2030",
+      "rank": "1",
+      "team": "Team Michigan",
+      "record": "10-2"
+    },
+    {
+      "year": "2030",
+      "rank": "2",
+      "team": "Juiced Cherries",
+      "record": "9-0"
+    }
+  ]
 }
