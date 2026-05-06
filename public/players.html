@@ -5,40 +5,103 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-900 text-white">
+<body class="bg-gray-100 text-black">
 
-<!-- NAVBAR -->
-<div class="bg-black border-b border-gray-800 px-8 py-4 flex justify-between items-center">
-  <h1 class="text-2xl font-bold text-blue-400">LacrosseHub</h1>
+<!-- TOP NAV -->
+<div class="bg-green-500 text-black px-6 py-3 flex justify-between items-center">
+  <h1 class="text-2xl font-bold">LacrosseHub</h1>
 
-  <div class="space-x-6 text-lg">
-    <a href="index.html" class="hover:text-blue-400">Home</a>
-    <a href="rankings.html" class="hover:text-blue-400">Rankings</a>
-    <a href="players.html" class="text-blue-400">Players</a>
-    <a href="events.html" class="hover:text-blue-400">Events</a>
+  <div class="space-x-6 font-semibold">
+    <a href="index.html">Home</a>
+    <a href="rankings.html">Rankings</a>
+    <a href="players.html" class="underline">Players</a>
+    <a href="events.html">Events</a>
   </div>
 </div>
 
-<div class="text-center py-12">
-  <h2 class="text-4xl font-bold">Players</h2>
+<!-- SECOND NAV -->
+<div class="bg-gray-800 text-white px-6 py-3 flex gap-6 text-sm overflow-x-auto">
+  <span class="font-bold">RECRUITING DATABASE</span>
+  <span class="text-green-400">PLAYERS</span>
+  <span>RANKINGS</span>
+  <span>STAR RATINGS</span>
+  <span>EVALUATIONS</span>
 </div>
 
-<div class="max-w-6xl mx-auto p-8 grid grid-cols-1 md:grid-cols-2 gap-6" id="players"></div>
+<!-- MAIN -->
+<div class="max-w-7xl mx-auto mt-8 px-6">
+
+  <div class="bg-white p-6 rounded shadow">
+    <h2 class="text-2xl font-bold mb-4">Player Database</h2>
+
+    <!-- FILTERS -->
+    <div class="flex gap-4 mb-6">
+      <select id="gradFilter" class="border p-2">
+        <option value="all">All Classes</option>
+        <option value="2030">Class of 2030</option>
+        <option value="2029">Class of 2029</option>
+        <option value="2028">Class of 2028</option>
+        <option value="2027">Class of 2027</option>
+        <option value="2026">Class of 2026</option>
+      </select>
+
+      <input id="search" placeholder="Search player..." class="border p-2 w-64">
+    </div>
+
+    <!-- TABLE -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm border">
+
+        <thead class="bg-gray-200 text-gray-700">
+          <tr>
+            <th class="p-3 text-left">NAME</th>
+            <th class="p-3 text-left">GRAD</th>
+            <th class="p-3 text-left">POSITION</th>
+            <th class="p-3 text-left">GOALS</th>
+          </tr>
+        </thead>
+
+        <tbody id="players" class="bg-white"></tbody>
+
+      </table>
+    </div>
+
+  </div>
+
+</div>
 
 <script>
+let allPlayers = [];
+
 fetch("/api/players")
   .then(r => r.json())
   .then(data => {
-    document.getElementById("players").innerHTML =
-      data.map(p => `
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg hover:scale-105 transition">
-          <h3 class="text-2xl font-bold text-blue-400">${p.name}</h3>
-          <p class="mt-2">Grad: ${p.grad}</p>
-          <p>Position: ${p.position}</p>
-          <p>Goals: ${p.goals}</p>
-        </div>
-      `).join("");
+    allPlayers = data;
+    renderPlayers();
   });
+
+document.getElementById("gradFilter").addEventListener("change", renderPlayers);
+document.getElementById("search").addEventListener("input", renderPlayers);
+
+function renderPlayers() {
+  const grad = document.getElementById("gradFilter").value;
+  const search = document.getElementById("search").value.toLowerCase();
+
+  const filtered = allPlayers.filter(p => {
+    return (grad === "all" || p.grad == grad) &&
+           p.name.toLowerCase().includes(search);
+  });
+
+  document.getElementById("players").innerHTML =
+    filtered.map(p => `
+      <tr class="border-b hover:bg-gray-100">
+        <td class="p-3 font-semibold">${p.name}</td>
+        <td class="p-3">${p.grad}</td>
+        <td class="p-3">${p.position}</td>
+        <td class="p-3">${p.goals}</td>
+      </tr>
+    `).join("");
+}
 </script>
 
 </body>
