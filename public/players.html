@@ -7,8 +7,8 @@
 
 <body class="bg-gray-100 text-black">
 
-<!-- TOP NAV -->
-<div class="bg-green-500 text-black px-6 py-3 flex justify-between items-center">
+<!-- NAV -->
+<div class="bg-green-500 px-6 py-3 flex justify-between items-center">
   <h1 class="text-2xl font-bold">LacrosseHub</h1>
 
   <div class="space-x-6 font-semibold">
@@ -19,49 +19,50 @@
   </div>
 </div>
 
-<!-- SECOND NAV -->
-<div class="bg-gray-800 text-white px-6 py-3 flex gap-6 text-sm overflow-x-auto">
+<!-- SUB NAV -->
+<div class="bg-gray-800 text-white px-6 py-3 flex gap-6 text-sm">
   <span class="font-bold">RECRUITING DATABASE</span>
   <span class="text-green-400">PLAYERS</span>
   <span>RANKINGS</span>
   <span>STAR RATINGS</span>
-  <span>EVALUATIONS</span>
 </div>
 
 <!-- MAIN -->
 <div class="max-w-7xl mx-auto mt-8 px-6">
 
   <div class="bg-white p-6 rounded shadow">
-    <h2 class="text-2xl font-bold mb-4">Player Database</h2>
+    <h2 class="text-2xl font-bold mb-4">Top Recruits</h2>
 
-    <!-- FILTERS -->
+    <!-- FILTER -->
     <div class="flex gap-4 mb-6">
-      <select id="gradFilter" class="border p-2">
+      <select id="classFilter" class="border p-2">
         <option value="all">All Classes</option>
-        <option value="2030">Class of 2030</option>
-        <option value="2029">Class of 2029</option>
-        <option value="2028">Class of 2028</option>
-        <option value="2027">Class of 2027</option>
-        <option value="2026">Class of 2026</option>
+        <option value="2030">2030</option>
+        <option value="2029">2029</option>
+        <option value="2028">2028</option>
+        <option value="2027">2027</option>
+        <option value="2026">2026</option>
       </select>
-
-      <input id="search" placeholder="Search player..." class="border p-2 w-64">
     </div>
 
     <!-- TABLE -->
     <div class="overflow-x-auto">
       <table class="w-full text-sm border">
 
-        <thead class="bg-gray-200 text-gray-700">
+        <thead class="bg-gray-200">
           <tr>
-            <th class="p-3 text-left">NAME</th>
-            <th class="p-3 text-left">GRAD</th>
+            <th class="p-3 text-left">PLAYER</th>
+            <th class="p-3 text-left">CLASS</th>
             <th class="p-3 text-left">POSITION</th>
-            <th class="p-3 text-left">GOALS</th>
+            <th class="p-3 text-left">STATE</th>
+            <th class="p-3 text-left">SCHOOL</th>
+            <th class="p-3 text-left">⭐</th>
+            <th class="p-3 text-left">RANK</th>
+            <th class="p-3 text-left">COMMIT</th>
           </tr>
         </thead>
 
-        <tbody id="players" class="bg-white"></tbody>
+        <tbody id="players"></tbody>
 
       </table>
     </div>
@@ -71,34 +72,39 @@
 </div>
 
 <script>
-let allPlayers = [];
+let playersData = [];
 
 fetch("/api/players")
-  .then(r => r.json())
+  .then(res => res.json())
   .then(data => {
-    allPlayers = data;
+    playersData = data;
     renderPlayers();
   });
 
-document.getElementById("gradFilter").addEventListener("change", renderPlayers);
-document.getElementById("search").addEventListener("input", renderPlayers);
+document.getElementById("classFilter").addEventListener("change", renderPlayers);
+
+function stars(num) {
+  return "★".repeat(Number(num) || 0);
+}
 
 function renderPlayers() {
-  const grad = document.getElementById("gradFilter").value;
-  const search = document.getElementById("search").value.toLowerCase();
+  const selectedClass = document.getElementById("classFilter").value;
 
-  const filtered = allPlayers.filter(p => {
-    return (grad === "all" || p.grad == grad) &&
-           p.name.toLowerCase().includes(search);
-  });
+  const filtered = playersData.filter(p =>
+    selectedClass === "all" || p.grad == selectedClass
+  );
 
   document.getElementById("players").innerHTML =
-    filtered.map(p => `
+    filtered.map((p, i) => `
       <tr class="border-b hover:bg-gray-100">
-        <td class="p-3 font-semibold">${p.name}</td>
-        <td class="p-3">${p.grad}</td>
-        <td class="p-3">${p.position}</td>
-        <td class="p-3">${p.goals}</td>
+        <td class="p-3 font-semibold">${p.name || "-"}</td>
+        <td class="p-3">${p.grad || "-"}</td>
+        <td class="p-3">${p.position || "-"}</td>
+        <td class="p-3">${p.state || "-"}</td>
+        <td class="p-3">${p.school || "-"}</td>
+        <td class="p-3 text-yellow-500">${stars(p.stars)}</td>
+        <td class="p-3 font-bold">${p.rank || i+1}</td>
+        <td class="p-3 text-blue-600">${p.commit || "-"}</td>
       </tr>
     `).join("");
 }

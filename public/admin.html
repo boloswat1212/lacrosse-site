@@ -13,12 +13,16 @@
 <div class="mb-10 bg-gray-800 p-6 rounded-xl">
   <h2 class="text-xl mb-4">Add Player</h2>
 
-  <input id="pname" placeholder="Name" class="text-black p-2 mr-2">
-  <input id="pgrad" placeholder="Grad" class="text-black p-2 mr-2">
-  <input id="ppos" placeholder="Position" class="text-black p-2 mr-2">
-  <input id="pgoals" placeholder="Goals" class="text-black p-2 mr-2">
+  <input id="pname" placeholder="Name" class="text-black p-2 mr-2 mb-2">
+  <input id="pgrad" placeholder="Grad (2027)" class="text-black p-2 mr-2 mb-2">
+  <input id="ppos" placeholder="Position" class="text-black p-2 mr-2 mb-2">
+  <input id="pstate" placeholder="State (NY)" class="text-black p-2 mr-2 mb-2">
+  <input id="pschool" placeholder="School" class="text-black p-2 mr-2 mb-2">
+  <input id="pstars" placeholder="Stars (1-5)" class="text-black p-2 mr-2 mb-2">
+  <input id="prank" placeholder="Rank (#)" class="text-black p-2 mr-2 mb-2">
+  <input id="pcommit" placeholder="Commitment (Duke)" class="text-black p-2 mr-2 mb-2">
 
-  <button onclick="addPlayer()" class="bg-blue-500 px-4 py-2 ml-2">Add</button>
+  <button onclick="addPlayer()" class="bg-blue-500 px-4 py-2 ml-2">Add Player</button>
 
   <h3 class="mt-6 mb-2">Player List</h3>
   <div id="playerList"></div>
@@ -32,7 +36,7 @@
   <input id="elocation" placeholder="Location" class="text-black p-2 mr-2">
   <input id="edate" placeholder="Date" class="text-black p-2 mr-2">
 
-  <button onclick="addEvent()" class="bg-blue-500 px-4 py-2 ml-2">Add</button>
+  <button onclick="addEvent()" class="bg-blue-500 px-4 py-2 ml-2">Add Event</button>
 
   <h3 class="mt-6 mb-2">Event List</h3>
   <div id="eventList"></div>
@@ -47,7 +51,7 @@
   <input id="rteam" placeholder="Team" class="text-black p-2 mr-2">
   <input id="rrecord" placeholder="Record" class="text-black p-2 mr-2">
 
-  <button onclick="addRanking()" class="bg-blue-500 px-4 py-2 ml-2">Add</button>
+  <button onclick="addRanking()" class="bg-blue-500 px-4 py-2 ml-2">Add Ranking</button>
 
   <h3 class="mt-6 mb-2">Ranking List</h3>
   <div id="rankingList"></div>
@@ -55,6 +59,7 @@
 
 <script>
 function loadAll() {
+
   // PLAYERS
   fetch("/api/players")
     .then(r => r.json())
@@ -62,7 +67,7 @@ function loadAll() {
       document.getElementById("playerList").innerHTML =
         data.map((p, i) => `
           <div class="flex justify-between bg-gray-700 p-2 mb-2 rounded">
-            <span>${p.name} (${p.grad})</span>
+            <span>${p.name} (${p.grad}) - ${p.commit || ""}</span>
             <button onclick="deletePlayer(${i})" class="bg-red-500 px-2">Delete</button>
           </div>
         `).join("");
@@ -95,20 +100,28 @@ function loadAll() {
     });
 }
 
-/* ADD */
+/* ADD PLAYER */
 function addPlayer() {
   fetch("/api/add-player", {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({
-      name: pname.value,
-      grad: pgrad.value,
-      position: ppos.value,
-      goals: pgoals.value
+      name: document.getElementById("pname").value,
+      grad: document.getElementById("pgrad").value,
+      position: document.getElementById("ppos").value,
+      state: document.getElementById("pstate").value,
+      school: document.getElementById("pschool").value,
+      stars: Number(document.getElementById("pstars").value),
+      rank: Number(document.getElementById("prank").value),
+      commit: document.getElementById("pcommit").value
     })
-  }).then(() => { alert("Added"); loadAll(); });
+  }).then(() => {
+    alert("Player Added");
+    loadAll();
+  });
 }
 
+/* ADD EVENT */
 function addEvent() {
   fetch("/api/add-event", {
     method: "POST",
@@ -118,9 +131,13 @@ function addEvent() {
       location: elocation.value,
       date: edate.value
     })
-  }).then(() => { alert("Added"); loadAll(); });
+  }).then(() => {
+    alert("Event Added");
+    loadAll();
+  });
 }
 
+/* ADD RANKING */
 function addRanking() {
   fetch("/api/add-ranking", {
     method: "POST",
@@ -131,7 +148,10 @@ function addRanking() {
       team: rteam.value,
       record: rrecord.value
     })
-  }).then(() => { alert("Added"); loadAll(); });
+  }).then(() => {
+    alert("Ranking Added");
+    loadAll();
+  });
 }
 
 /* DELETE */
@@ -140,7 +160,7 @@ function deletePlayer(i) {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ index: i })
-  }).then(() => loadAll());
+  }).then(loadAll);
 }
 
 function deleteEvent(i) {
@@ -148,7 +168,7 @@ function deleteEvent(i) {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ index: i })
-  }).then(() => loadAll());
+  }).then(loadAll);
 }
 
 function deleteRanking(i) {
@@ -156,7 +176,7 @@ function deleteRanking(i) {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ index: i })
-  }).then(() => loadAll());
+  }).then(loadAll);
 }
 
 loadAll();

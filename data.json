@@ -4,7 +4,21 @@
       "name": "Blake Bologna",
       "grad": "2030",
       "position": "Defense",
-      "goals": "1"
+      "state": "MI",
+      "school": "Covington",
+      "stars": 3,
+      "rank": 136,
+      "commit": "Birmingham United"
+    },
+    {
+      "name": "Thomas Andrews",
+      "grad": "2030",
+      "position": "Defense",
+      "state": "MI",
+      "school": "North Hills",
+      "stars": 3,
+      "rank": 137,
+      "commit": "North Hills Varsity"
     }
   ],
   "events": [],
