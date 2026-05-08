@@ -2,69 +2,82 @@
 <html>
 <head>
   <title>Players</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <script src="https://cdn.tailwindcss.com"></script>
+
 </head>
 
-<body class="bg-gray-100 text-black">
+<body class="bg-gray-100">
 
 <!-- NAV -->
-<div class="bg-green-500 px-6 py-3 flex justify-between items-center">
-  <h1 class="text-2xl font-bold">LacrosseHub</h1>
+<div class="bg-green-500 px-4 py-3 flex justify-between items-center">
 
-  <div class="space-x-6 font-semibold">
+  <h1 class="text-xl md:text-2xl font-bold">
+    LacrosseHub
+  </h1>
+
+  <div class="hidden md:flex space-x-6 font-semibold">
     <a href="index.html">Home</a>
     <a href="rankings.html">Rankings</a>
-    <a href="players.html" class="underline">Players</a>
+    <a href="players.html">Players</a>
     <a href="events.html">Events</a>
   </div>
+
+  <button class="md:hidden text-2xl" onclick="toggleMenu()">
+    ☰
+  </button>
+
 </div>
 
-<!-- SUB NAV -->
-<div class="bg-gray-800 text-white px-6 py-3 flex gap-6 text-sm">
-  <span class="font-bold">RECRUITING DATABASE</span>
-  <span class="text-green-400">PLAYERS</span>
-  <span>RANKINGS</span>
-  <span>STAR RATINGS</span>
+<!-- MOBILE MENU -->
+<div id="mobileMenu"
+class="hidden bg-green-400 px-4 py-4 space-y-3 md:hidden">
+
+  <a href="index.html" class="block">Home</a>
+  <a href="rankings.html" class="block">Rankings</a>
+  <a href="players.html" class="block">Players</a>
+  <a href="events.html" class="block">Events</a>
+
 </div>
 
 <!-- MAIN -->
-<div class="max-w-7xl mx-auto mt-8 px-6">
+<div class="max-w-7xl mx-auto mt-6 px-4">
 
-  <div class="bg-white p-6 rounded shadow">
-    <h2 class="text-2xl font-bold mb-4">Top Recruits</h2>
+  <div class="bg-white rounded shadow p-4">
 
-    <!-- FILTER -->
-    <div class="flex gap-4 mb-6">
-      <select id="classFilter" class="border p-2">
-        <option value="all">All Classes</option>
-        <option value="2030">2030</option>
-        <option value="2029">2029</option>
-        <option value="2028">2028</option>
-        <option value="2027">2027</option>
-        <option value="2026">2026</option>
-      </select>
-    </div>
+    <h2 class="text-2xl font-bold mb-4">
+      Player Rankings
+    </h2>
 
-    <!-- TABLE -->
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm border">
+    <!-- SCROLLABLE TABLE -->
+    <div class="overflow-y-auto overflow-x-auto border rounded"
+    style="max-height: 700px;">
 
-        <thead class="bg-gray-200">
+      <table class="w-full text-sm">
+
+        <thead class="bg-gray-200 sticky top-0">
+
           <tr>
+
+            <th class="p-3 text-left">RANK</th>
             <th class="p-3 text-left">PLAYER</th>
             <th class="p-3 text-left">CLASS</th>
             <th class="p-3 text-left">POSITION</th>
             <th class="p-3 text-left">STATE</th>
             <th class="p-3 text-left">SCHOOL</th>
             <th class="p-3 text-left">⭐</th>
-            <th class="p-3 text-left">RANK</th>
             <th class="p-3 text-left">COMMIT</th>
+
           </tr>
+
         </thead>
 
         <tbody id="players"></tbody>
 
       </table>
+
     </div>
 
   </div>
@@ -72,42 +85,72 @@
 </div>
 
 <script>
-let playersData = [];
+
+function toggleMenu() {
+
+  document
+    .getElementById("mobileMenu")
+    .classList
+    .toggle("hidden");
+
+}
 
 fetch("/api/players")
-  .then(res => res.json())
-  .then(data => {
-    playersData = data;
-    renderPlayers();
+.then(r => r.json())
+.then(data => {
+
+  // SORT PLAYERS BY RANK
+  data.sort((a, b) => {
+
+    return Number(a.rank || 9999)
+      - Number(b.rank || 9999);
+
   });
 
-document.getElementById("classFilter").addEventListener("change", renderPlayers);
-
-function stars(num) {
-  return "★".repeat(Number(num) || 0);
-}
-
-function renderPlayers() {
-  const selectedClass = document.getElementById("classFilter").value;
-
-  const filtered = playersData.filter(p =>
-    selectedClass === "all" || p.grad == selectedClass
-  );
-
   document.getElementById("players").innerHTML =
-    filtered.map((p, i) => `
+
+    data.map(player => `
+
       <tr class="border-b hover:bg-gray-100">
-        <td class="p-3 font-semibold">${p.name || "-"}</td>
-        <td class="p-3">${p.grad || "-"}</td>
-        <td class="p-3">${p.position || "-"}</td>
-        <td class="p-3">${p.state || "-"}</td>
-        <td class="p-3">${p.school || "-"}</td>
-        <td class="p-3 text-yellow-500">${stars(p.stars)}</td>
-        <td class="p-3 font-bold">${p.rank || i+1}</td>
-        <td class="p-3 text-blue-600">${p.commit || "-"}</td>
+
+        <td class="p-3 font-bold">
+          #${player.rank || "-"}
+        </td>
+
+        <td class="p-3 font-semibold">
+          ${player.name || "-"}
+        </td>
+
+        <td class="p-3">
+          ${player.grad || "-"}
+        </td>
+
+        <td class="p-3">
+          ${player.position || "-"}
+        </td>
+
+        <td class="p-3">
+          ${player.state || "-"}
+        </td>
+
+        <td class="p-3">
+          ${player.school || "-"}
+        </td>
+
+        <td class="p-3 text-yellow-500">
+          ${"★".repeat(Number(player.stars || 0))}
+        </td>
+
+        <td class="p-3 text-blue-600 font-semibold">
+          ${player.commit || "-"}
+        </td>
+
       </tr>
+
     `).join("");
-}
+
+});
+
 </script>
 
 </body>
